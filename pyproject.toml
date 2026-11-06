@@ -1,0 +1,105 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "universal-serp-api"
+version = "1.0.0"
+description = "Independent, provider-agnostic search and web data extraction platform"
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+authors = [{ name = "Universal SERP API" }]
+dependencies = [
+  "fastapi==0.162.0",
+  "uvicorn[standard]==0.54.0",
+  "pydantic==2.14.2",
+  "pydantic-settings==2.16.2",
+  "httpx==0.28.1",
+  "orjson==3.13.0",
+  "sqlalchemy[asyncio]==2.1.8",
+  "asyncpg==0.32.0",
+  "alembic==1.20.1",
+  "redis==5.3.1",
+  "arq==0.28.0",
+  "beautifulsoup4==4.15.0",
+  "lxml==6.1.3",
+  "prometheus-client==0.26.0",
+  "playwright==1.64.1",
+  "sentry-sdk==2.19.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "aiosqlite==0.22.1",
+  "fakeredis==2.40.0",
+  "pytest==9.2.0",
+  "pytest-asyncio==1.4.1.post1",
+  "pytest-cov==7.1.0",
+  "coverage==7.17.1",
+  "ruff==0.17.3",
+  "mypy==2.4.1",
+  "pre-commit==4.0.1",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "integration: integration tests that use the application stack",
+  "security: security-focused tests",
+  "performance: performance-oriented tests",
+  "slow: slow tests",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/workers/*", "*/migrations/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC", "S", "C4", "SIM", "RUF"]
+ignore = [
+  "S101",
+  "S311",
+  "B008",
+  "RUF001",
+  "RUF002",
+  "RUF003",
+  "SIM108",
+  "ASYNC109",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "S311", "S324", "S108"]
+"app/workers/**" = ["S105"]
+"app/config.py" = ["S104", "S105"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+exclude = ["migrations", "\\.venv"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
